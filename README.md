@@ -1,2 +1,2 @@
 # TCS_Dispur_Wireless
-Connection management module with hibernate integration
+Connection management module with spring and hibernate integration
