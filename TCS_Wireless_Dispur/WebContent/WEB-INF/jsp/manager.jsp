@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" isELIgnored="false" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -32,7 +34,7 @@
        
         <ul id="nav-mobile" class="right hide-on-med-and-down">
       
-          <li><a href="index.html" class="red">Logout</a></li>
+          <li><a href="logout.html" class="red">Logout</a></li>
       
         </ul>
       </div>
@@ -61,43 +63,27 @@
       <tr>
         <th>Customer Id</th>
         <th>Customer Name</th>
+        <th>Customer Address</th>
         <th>Customer Email</th>
-        <th>Customer ContactNo</th>
+        <th>Customer Contact Number</th>
         <th>Customer Login Password</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody id="myTable">
-      <tr>
-        <td>1</td>
-        <td>Abhishek Deshpande</td>
-        <td>abc90@gmail.com</td>
-        <td>+918499672055</td>
-        <td>Abhi@123</td>
-        <td>
-          <a class="waves-effect waves-light btn modal-trigger" href="#modal1">View</a>
-        </td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>Vishwajeet Dealkar</td>
-        <td>vish90@gmail.com</td>
-        <td>+917499672055</td>
-        <td>vish@123</td>
-        <td>
-          <a class="waves-effect waves-light btn modal-trigger" href="#modal1">View</a>
-        </td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>Vivek Deshpande</td>
-        <td>vivi90@gmail.com</td>
-        <td>+916499672055</td>
-        <td>vivek@123</td>
-        <td>
-          <a class="waves-effect waves-light btn modal-trigger" href="#modal1">View</a>
-        </td>
-      </tr>
+    <c:forEach items="${list}" var="customer">
+		<tr>
+			<td class="customerId">${customer.customerid}</td>
+			<td class="customerName">${customer.customername}</td>
+			<td class="customerAddress">${customer.customeraddress}</td>
+			<td class="customerEmail">${customer.customeremail}</td>
+			<td class="customerContactNumber">${customer.customercontactnumber}</td>
+			<td class="customerLoginPassword">${customer.customerloginpassword}</td>
+			<td>
+            	<a class="waves-effect waves-light btn modal-trigger modalBtn" href="#modal1">View</a>
+          	</td>
+		</tr>
+	</c:forEach>   
     </tbody>
   </table>
 

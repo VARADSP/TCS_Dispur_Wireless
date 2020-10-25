@@ -37,7 +37,7 @@
         </ul>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li><a href="customer_subscriptions.html" class="green">My Subscriptions</a></li>
-          <li><a href="<c:url value='/logout' />" class="red">Logout</a></li>
+          <li><a href="logout.html" class="red">Logout</a></li>
         </ul>
       </div>
     </nav>

@@ -38,10 +38,11 @@
   $(document).ready(function(){
     $('.sidenav').sidenav();
   });
+  
   </script>
 <!-- partial:index.partial.html -->
 <div class="form">
-      
+      <p style="color:red">${message}</p>
       <ul class="tab-group">
         <li class="tab active"><a href="#customerLogin">Customer</a></li>
         <li class="tab"><a href="#managerLogin">Relationship Manager</a></li>
