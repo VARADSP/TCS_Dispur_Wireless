@@ -9,6 +9,8 @@ public interface SubscriptionDAO {
 
 	public void save(Subscription p);
 	
-	public List<Subscription> list();
+	public void delete(Subscription p);
+	
+	public List<Subscription> list(int customerid);
 	
 }

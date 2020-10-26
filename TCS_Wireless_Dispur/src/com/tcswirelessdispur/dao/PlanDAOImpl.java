@@ -1,7 +1,9 @@
 package com.tcswirelessdispur.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -32,5 +34,20 @@ public class PlanDAOImpl implements PlanDAO {
 		List<Plan> personList = session.createQuery("from Plan").list();
 		session.close();
 		return personList;
+	}
+
+	@Override
+	public List<Plan> listOfSubscriptions(List<Integer> list) {
+		try {
+		Session session = this.sessionFactory.openSession();		
+		@SuppressWarnings("unchecked")
+		Query query = session.createQuery("from Plan where planid in (:listofplans)").setParameterList("listofplans", list);
+		List<Plan> personList = query.list();
+		session.close();
+		return personList;
+		}
+		catch(Exception e) {
+			return new ArrayList<Plan>();
+		}
 	}
 }

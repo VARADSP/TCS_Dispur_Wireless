@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" isELIgnored="false" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -28,11 +30,11 @@
         <a href="#!" class="brand-logo center">TCS Dispur Wireless</a>
         
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-          <li>Welcome CustomerName</li>
+          <li>Welcome ${sessionScope.loginname} </li>
         </ul>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li><a href="customer.html" class="green">Available Plans</a></li>
-          <li><a href="index.html" class="red">Logout</a></li>
+          <li><a href="logout.html" class="red">Logout</a></li>
         </ul>
       </div>
     </nav>
@@ -43,8 +45,7 @@
   <!-- Modal Structure -->
 <div id="modal1" class="modal">
   <div class="modal-content">
-    <h4>Plan Details</h4>
-    <p>plans</p>
+      <div class="GFGclass" id="divGFG"></div>
   </div>
   <div class="modal-footer">
     <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -53,7 +54,12 @@
 <!-- partial:index.partial.html -->
 <div class="container">
   <!-- Page Content goes here -->
-
+<c:if test="${not empty model.error}">
+   <script>
+   M.toast({html: '<p style="color:red;">plan must be atleast 3 months old to cancel :(</p>',classes: 'white rounded'})
+   instance.open();
+   </script>
+</c:if>
 
   <div class="container">
     <h2>My Subscriptions</h2>
@@ -73,32 +79,21 @@
         </tr>
       </thead>
       <tbody id="myTable">
-        <tr>
-          <td>1</td>
-          <td>ABC Plan</td>
-          <td>Broadband</td>
-          <td><p>&#x20b9; 9500</p></td>
-          <td>3 Months</td>
-          <td><p>&#x20b9; 2500</p></td>
-          <td>Fri Oct 23 2020 14:20:38</td>
-          <td>
-            <a class="waves-effect waves-light btn modal-trigger grey" href="#modal1">View</a>
-          </td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>ABC Plan2</td>
-          <td>Broadband</td>
-          <td><p>&#x20b9; 11500</p></td>
-          <td>6 Months</td>
-          <td><p>&#x20b9; 3500</p></td>
-          <td>Thu Oct 22 2020 12:20:38</td>
-          <td>
-            <a class="waves-effect waves-light btn modal-trigger grey" href="#modal1">View</a>
-          </td>
-        </tr>
-       
-   
+       <c:forEach items="${sessionScope.subscriptionlist}" var="plan">
+		<tr>
+			<td class="planId">${plan.planid}</td>
+			<td class="planName">${plan.planname}</td>
+			<td class="planType">${plan.plantype}</td>
+			<td class="planPrice">${plan.plantariff}</td>
+			<td class="planValidity">${plan.planvalidity}</td>
+			<td><p>&#x20b9;${plan.planrental}</p></td>
+			<td class="planStartDate">${plan.planstartdate}</td>			
+			<td style='white-space: nowrap'>
+				<a class="waves-effect waves-light red btn modal-trigger modalBtn" href='cancelplan?planid=${plan.planid}&planstartdate=${plan.planstartdate}'>Cancel</a>
+            	<a class="waves-effect waves-light btn modal-trigger modalBtn" href="#modal1">Change</a>
+          	</td>
+		</tr>
+	</c:forEach>   
       </tbody>
     </table>
   

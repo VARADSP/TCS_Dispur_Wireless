@@ -33,7 +33,7 @@
         <a href="#!" class="brand-logo center">TCS Dispur Wireless</a>
         
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-          <li>Welcome CustomerName</li>
+          <li>Welcome ${sessionScope.loginname} </li>
         </ul>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li><a href="customer_subscriptions.html" class="green">My Subscriptions</a></li>
@@ -50,10 +50,6 @@
   <div class="modal-content">
     <h4>Plan Details</h4>
     <div class="GFGclass" id="divGFG"></div>
-    <button class="btn waves-effect waves-light" type="submit" name="action">
-      Pay Now
-      <i class="material-icons">send</i>
-    </button>                         
   </div>
   <div class="modal-footer">
     <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -68,7 +64,7 @@
     <h2>List Of Available Plans</h2>
     <input class="form-control" id="myInput" type="text" placeholder="Search..">
     <br>
-    <c:if test="${!empty list}">
+    <c:if test="${!empty planlist}">
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -82,7 +78,7 @@
         </tr>
       </thead>
       <tbody id="myTable">
-      <c:forEach items="${list}" var="plan">
+      <c:forEach items="${sessionScope.planlist}" var="plan">
 		<tr>
 			<td class="planId">${plan.planid}</td>
 			<td class="planName">${plan.planname}</td>
@@ -131,6 +127,7 @@
              $(this).parents("tr").find(".planPrice").text(); 
                     var e =  
              $(this).parents("tr").find(".planValidity").text(); 
+               var id = $(this).parents("tr").find(".planId").text();
                     var p = ""; 
                     // CREATING DATA TO SHOW ON MODEL 
                     p +=  
@@ -146,6 +143,8 @@
                     p +=  
               "<p id='e' name='GFGcoding' >Plan Validity: " 
                       + e + " </p>"; 
+                      
+                      p += "<a class='btn waves-effect waves-light' href='subscribeplan?planid="+id+"'> Pay Now <i class='material-icons'>send</i></button>";
                     //CLEARING THE PREFILLED DATA 
                     $("#divGFG").empty(); 
                     //WRITING THE DATA ON MODEL 

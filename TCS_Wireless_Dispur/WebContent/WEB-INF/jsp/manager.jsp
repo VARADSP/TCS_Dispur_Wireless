@@ -48,6 +48,7 @@
   <div class="modal-content">
     <h4>Customer Plan Details</h4>
     <p>plans</p>
+    <div class="GFGclass" id="divGFG"></div>
   </div>
   <div class="modal-footer">
     <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -71,16 +72,30 @@
       </tr>
     </thead>
     <tbody id="myTable">
-    <c:forEach items="${list}" var="customer">
+    <c:forEach items="${sessionScope.customerdata}" var="customer">
 		<tr>
-			<td class="customerId">${customer.customerid}</td>
-			<td class="customerName">${customer.customername}</td>
-			<td class="customerAddress">${customer.customeraddress}</td>
-			<td class="customerEmail">${customer.customeremail}</td>
-			<td class="customerContactNumber">${customer.customercontactnumber}</td>
-			<td class="customerLoginPassword">${customer.customerloginpassword}</td>
+			<td class="customerId">${customer.key.customerid}</td>
+			<td class="customerName">${customer.key.customername}</td>
+			<td class="customerAddress">${customer.key.customeraddress}</td>
+			<td class="customerEmail">${customer.key.customeremail}</td>
+			<td class="customerContactNumber">${customer.key.customercontactnumber}</td>
+			<td class="customerLoginPassword">${customer.key.customerloginpassword}</td>
 			<td>
-            	<a class="waves-effect waves-light btn modal-trigger modalBtn" href="#modal1">View</a>
+            	<a class="waves-effect waves-light btn modal-trigger modalBtn" href="#modal1" data-customer-id="${customer.key.customerid}">View</a>
+          	</td>
+          	<td class="customerplans" style="visibility:hidden;">			 
+   			<c:forEach items="${customer.value}" var="plan">
+   			<div id="plan${plan.planid}">
+   				<input type="hidden" class="planid" value="${plan.planid}">
+   				<input type="hidden" class="planname" value="${plan.planname}">
+   				<input type="hidden" class="plantype" value="${plan.plantype}">
+   				<input type="hidden" class="plantariff" value="${plan.plantariff}">
+   				<input type="hidden" class="planvalidity" value="${plan.planvalidity}">
+   				<input type="hidden" class="planrentel" value="${plan.planrental}">
+   				<input type="hidden" class="planstartdate" value="${plan.planstartdate}">
+   			</div>
+   			</c:forEach>
+		
           	</td>
 		</tr>
 	</c:forEach>   
@@ -108,6 +123,50 @@
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
+    
+    $(".modalBtn").on('click',function(){
+        var customerplans = $(this).parents("tr").find(".customerplans"); 
+        var p = ""; 
+        $(customerplans).children().each( function(index, element) {
+           // children's element
+            		   var id = $(element).children().get(0).value;
+      			       var a =  $(element).children().get(1).value; 
+                       var c = $(element).children().get(2).value; 
+                       var d = $(element).children().get(3).value; 
+                       var e = $(element).children().get(4).value; 
+                       
+                       // CREATING DATA TO SHOW ON MODEL 
+                         p +=  
+                 "<p id='a' name='GFGusername' >Plan Id: " 
+                         + id + " </p>"; 
+                         
+                       p +=  
+                 "<p id='a' name='GFGusername' >Plan Name: " 
+                         + a + " </p>"; 
+                       
+                       p += 
+                 "<p id='c' name='GFGpp'>Plan Type: "  
+                         + c + "</p>"; 
+                       p +=  
+                 "<p id='d' name='GFGscores' >Plan Price: " 
+                         + d + " </p>"; 
+                       p +=  
+                 "<p id='e' name='GFGcoding' >Plan Validity: " 
+                         + e + " </p>"; 
+                         
+                         p +=  
+                             "<br>"; 
+                              
+                       //CLEARING THE PREFILLED DATA 
+                      
+            
+         });
+        $("#divGFG").empty(); 
+        //WRITING THE DATA ON MODEL 
+        $("#divGFG").append(p); 
+        });
+
+    
   });
   </script>
 
