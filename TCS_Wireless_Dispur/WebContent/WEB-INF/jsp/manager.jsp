@@ -14,8 +14,17 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script  src="./script.js"></script>
 <!-- Compiled and minified JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  
+<style>
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
 
+main {
+  flex: 1 0 auto;
+}
+</style>
 </head>
 <body>
 
@@ -42,7 +51,7 @@
   </div>
 
 </header>
-
+<main>
 <!-- Modal Structure -->
 <div id="modal1" class="modal">
   <div class="modal-content">
@@ -98,13 +107,14 @@
 		
           	</td>
 		</tr>
+		
 	</c:forEach>   
     </tbody>
   </table>
 
 </div>
-
-<footer class="page-footer blue" style="position:fixed;bottom:0;left:0;width:100%;">
+</main>
+<footer class="page-footer blue">
 
     <div class="container">
     © 2020 Copyright Text

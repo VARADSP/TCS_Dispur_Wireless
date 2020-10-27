@@ -26,7 +26,13 @@ html {
 body {
   background: #c1bdba;
   font-family: 'Titillium Web', sans-serif;
+  display: flex;
+    min-height: 100vh;
+    flex-direction: column;
 }
+ main {
+    flex: 1 0 auto;
+  }
 
 a {
   text-decoration: none;
@@ -213,7 +219,7 @@ textarea {
   </div>
 
 </header>
-
+<main>
 <!-- partial:index.partial.html -->
 <div class="form">
 <c:if test="${not empty message}">
@@ -287,7 +293,8 @@ textarea {
       </div><!-- tab-content -->
       
 </div> <!-- /form -->
-<footer class="page-footer blue" style="position:fixed;bottom:0;left:0;width:100%;">
+</main>
+<footer class="page-footer blue">
 
     <div class="container">
     © 2020 Copyright Text
