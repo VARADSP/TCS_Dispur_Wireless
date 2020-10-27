@@ -45,6 +45,7 @@
   <!-- Modal Structure -->
 <div id="modal1" class="modal">
   <div class="modal-content">
+   <h4>Available Plans To Change</h4>
       <div class="GFGclass" id="divGFG"></div>
   </div>
   <div class="modal-footer">
@@ -56,7 +57,7 @@
   <!-- Page Content goes here -->
 <c:if test="${not empty model.error}">
    <script>
-   M.toast({html: '<p style="color:red;">plan must be atleast 3 months old to cancel :(</p>',classes: 'white rounded'})
+   M.toast({html: '<p style="color:red;">${model.error} :(</p>',classes: 'white rounded'})
    instance.open();
    </script>
 </c:if>
@@ -79,7 +80,7 @@
         </tr>
       </thead>
       <tbody id="myTable">
-       <c:forEach items="${sessionScope.subscriptionlist}" var="plan">
+       <c:forEach items="${model.list}" var="plan">
 		<tr>
 			<td class="planId">${plan.planid}</td>
 			<td class="planName">${plan.planname}</td>
@@ -89,8 +90,23 @@
 			<td><p>&#x20b9;${plan.planrental}</p></td>
 			<td class="planStartDate">${plan.planstartdate}</td>			
 			<td style='white-space: nowrap'>
-				<a class="waves-effect waves-light red btn modal-trigger modalBtn" href='cancelplan?planid=${plan.planid}&planstartdate=${plan.planstartdate}'>Cancel</a>
+				<a class="waves-effect waves-light red btn modal-trigger" href='cancelplan?planid=${plan.planid}&planstartdate=${plan.planstartdate}'>Cancel</a>
             	<a class="waves-effect waves-light btn modal-trigger modalBtn" href="#modal1">Change</a>
+          	</td>
+          	<td class="remainingplans" style="visibility:hidden;">			 
+   			<c:forEach items="${model.availablePlansToChange}" var="plan2">
+   			<div id="plan${plan.planid}">
+   				<input type="hidden" class="planid" value="${plan2.planid}">
+   				<input type="hidden" class="planname" value="${plan2.planname}">
+   				<input type="hidden" class="plantype" value="${plan2.plantype}">
+   				<input type="hidden" class="plantariff" value="${plan2.plantariff}">
+   				<input type="hidden" class="planvalidity" value="${plan2.planvalidity}">
+   				<input type="hidden" class="planrentel" value="${plan2.planrental}">
+   				<input type="hidden" class="customerid" value="${model.customerid}">
+   				<input type="hidden" class="oldplanid" value="${plan.planid}">   				
+   			</div>
+   			</c:forEach>
+		
           	</td>
 		</tr>
 	</c:forEach>   
@@ -120,6 +136,77 @@
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
+    
+    $(".modalBtn").on('click',function(){
+    	console.log("click");
+        var customerplans = $(this).parents("tr").find(".remainingplans"); 
+        var p = 
+        	"<table class='table table-bordered'>"+
+        	 "<thead>"+
+        "<tr>"+
+          "<th>Plan Id</th>"+
+          "<th>Plan Name</th>"+
+          "<th>Plan Type</th>"+
+          "<th>Plan Tariff</th>"+
+          "<th>Plan Validity</th>"+
+          "<th>Plan Rental</th>"
+          "<th>Action</th>"+
+        "</tr>"+
+      "</thead>"+
+      "<tbody id='myTable'>";
+
+        $(customerplans).children().each( function(index, element) {
+           // children's element
+            		  p += "<tr>";
+           			   var id = $(element).children().get(0).value;
+      			       var a =  $(element).children().get(1).value; 
+                       var c = $(element).children().get(2).value; 
+                       var d = $(element).children().get(3).value; 
+                       var e = $(element).children().get(4).value; 
+                       var f = $(element).children().get(5).value; 
+                       var customerid = $(element).children().get(6).value; 
+                       var oldplanid = $(element).children().get(7).value; 
+                       
+                       
+                       
+                       // CREATING DATA TO SHOW ON MODEL 
+                         p +=  
+                 "<td id='a' name='planId' >Plan Id: " 
+                         + id + " </td>"; 
+                         
+                       p +=  
+                 "<td id='a' name='planName' >Plan Name: " 
+                         + a + " </td>"; 
+                       
+                       p += 
+                 "<td id='c' name='planType'>Plan Type: "  
+                         + c + "</td>"; 
+                       p +=  
+                 "<td id='d' name='planPrice' >Plan Price: " 
+                         + d + " </td>"; 
+                       p +=  
+                 "<td id='e' name='planValidity' >Plan Validity: " 
+                         + e + " </td>"; 
+                         
+                       p +=  
+                  "<td id='f' name='planRental' >Plan Rental: " 
+                          + f + " </td>"; 
+               
+                       p +=  
+                   "<td id='g' name='action' >" 
+                           + "<a class='waves-effect waves-light btn modal-trigger' href='changeplan?newplanid="+id+"&oldplanid="+oldplanid+"&customerid="+customerid+"'>Change</a>" + " </td>"; 
+                                      
+                         p +=  
+                             "</tr>"; 
+                              
+                       //CLEARING THE PREFILLED DATA 
+                      
+            
+         });
+        $("#divGFG").empty(); 
+        //WRITING THE DATA ON MODEL 
+        $("#divGFG").append(p); 
+        });
   });
   </script>
 

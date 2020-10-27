@@ -11,4 +11,6 @@ public interface PlanDAO {
 	public List<Plan> list();
 	
 	public List<Plan> listOfSubscriptions(List<Integer> list);
+
+	public List<Plan> listOfRemainingPlans(List<Integer> list);
 }

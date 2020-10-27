@@ -64,7 +64,7 @@
     <h2>List Of Available Plans</h2>
     <input class="form-control" id="myInput" type="text" placeholder="Search..">
     <br>
-    <c:if test="${!empty planlist}">
+    
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -93,7 +93,7 @@
 	</c:forEach>   
       </tbody>
     </table>
-  </c:if>
+
   </div>
   
 

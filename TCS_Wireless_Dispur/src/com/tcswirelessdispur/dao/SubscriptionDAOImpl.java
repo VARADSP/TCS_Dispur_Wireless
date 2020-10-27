@@ -37,6 +37,20 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
 		tx.commit();
 		session.close();
 	}
+	
+	@Override
+	public void change(Subscription p,int newPlanId) {
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		session.delete(p);
+		Query query = session.createQuery("Update Subscription r set r.sub_planid=:z where r.sub_customerid = :x and r.sub_planid = :y");
+		query.setParameter("x", p.getSub_customerid());
+		query.setParameter("y", p.getSub_planid());
+		query.setParameter("z",newPlanId);
+		query.executeUpdate();
+		tx.commit();
+		session.close();
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -47,4 +61,13 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
 		return personList;
 	}
 
+	
+	public Boolean exists (Subscription old) {
+		Session session = this.sessionFactory.openSession();
+	    Query query = session.             
+	    createQuery("select 1 from Subscription t where t.sub_customerid = :customerid and t.sub_planid=:planid");
+	        query.setParameter("customerid", old.getSub_customerid());
+	        query.setParameter("planid", old.getSub_planid());	        
+	    return (query.uniqueResult() != null);
+	}
 }

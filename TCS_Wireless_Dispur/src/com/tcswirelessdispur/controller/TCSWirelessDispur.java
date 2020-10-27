@@ -43,15 +43,21 @@ public class TCSWirelessDispur {
 		return new ModelAndView("customer", "message", message);
 	}
 	
-	@RequestMapping(value="/customer",method = RequestMethod.POST)
-	public ModelAndView loginAsCustomer(@RequestParam("userid") String username,
-			@RequestParam("password") String password,
+	@RequestMapping(value="/customer",method = {RequestMethod.POST,RequestMethod.GET})
+	public ModelAndView loginAsCustomer(@RequestParam(value="userid",required = false) String username,
+			@RequestParam(value = "password",required = false) String password,
 			HttpSession session
 			) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");	
 		CustomerDAO customerDAO = context.getBean(CustomerDAO.class);
 		try {
-			
+		if(session.getAttribute("customerid") != null) {
+			PlanDAO personDAO = context.getBean(PlanDAO.class);
+			List<Plan> list = personDAO.list();
+			session.setAttribute("planlist", list);
+			context.close();
+			return new ModelAndView("customer", "list", list);
+		}	
 		Customer customer = customerDAO.getCustomerById(Integer.parseInt(username));
 		if(customer == null || !customer.getCustomerloginpassword().equals(password)) {
 			context.close();
@@ -59,9 +65,6 @@ public class TCSWirelessDispur {
 		}
 		PlanDAO personDAO = context.getBean(PlanDAO.class);
 		List<Plan> list = personDAO.list();
-		for(Plan p : list){
-			System.out.println("Plan List::"+p);
-		}
 		session.setAttribute("customerid", username);
 		session.setAttribute("loginname", customer.getCustomername());
 		//close resources
@@ -114,23 +117,30 @@ public class TCSWirelessDispur {
 			HttpSession session
 			) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");	
+		Map<String, Object> model = new HashMap<String, Object>();
 		try {
 		SubscriptionDAO personDAO = context.getBean(SubscriptionDAO.class);
 		List<Subscription> list = personDAO.list(Integer.parseInt(session.getAttribute("customerid").toString()));
 		ArrayList<Integer> listOfPlanIds = new ArrayList<Integer>();
+		HashMap<Integer,String> startdates = new HashMap<Integer,String>();
 		for(Subscription s : list) {
 			listOfPlanIds.add(s.getSub_planid());
+			startdates.put(s.getSub_planid(), s.getSub_startdate());
 		}
 		PlanDAO planDAO = context.getBean(PlanDAO.class);
 		List<Plan> planList = planDAO.listOfSubscriptions(listOfPlanIds);
+		List<Plan> availablePlansToChange = planDAO.listOfRemainingPlans(listOfPlanIds);
 		List<SubscribedPlans> finalList = new ArrayList<SubscribedPlans>();
 		for(int i=0;i<planList.size();i++) {
-			finalList.add(new SubscribedPlans(planList.get(i).getPlanid(), planList.get(i).getPlanname(), planList.get(i).getPlantype(), planList.get(i).getPlantariff(), planList.get(i).getPlanvalidity(), planList.get(i).getPlanrental(), list.get(i).getSub_startdate()));
+			finalList.add(new SubscribedPlans(planList.get(i).getPlanid(), planList.get(i).getPlanname(), planList.get(i).getPlantype(), planList.get(i).getPlantariff(), planList.get(i).getPlanvalidity(), planList.get(i).getPlanrental(), startdates.get(planList.get(i).getPlanid())));
 		}
 		//close resources
 		context.close();
 		session.setAttribute("subscriptionlist", finalList);
-		return new ModelAndView("customer_subscriptions", "list", finalList);
+		model.put("list", finalList);
+		model.put("availablePlansToChange", availablePlansToChange);
+		model.put("customerid", session.getAttribute("customerid").toString());
+		return new ModelAndView("customer_subscriptions", "model", model);
 		}
 		catch (Exception e) {
 			return new ModelAndView("index","message","something went wrong ! Please try again");
@@ -143,21 +153,27 @@ public class TCSWirelessDispur {
 	public ModelAndView subscribePlan(@RequestParam("planid") String planid,
 			HttpSession session
 			) {
+		Map<String, Object> model = new HashMap<String, Object>();
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");	
 		try {
 		SubscriptionDAO personDAO = context.getBean(SubscriptionDAO.class);
 		Subscription newPlan = new Subscription();
 		newPlan.setSub_planid(Integer.parseInt(planid));
 		newPlan.setSub_customerid(Integer.parseInt(session.getAttribute("customerid").toString()));
-		personDAO.save(newPlan);
+		if(!personDAO.exists(newPlan)) {
+			personDAO.save(newPlan);		
+		}
+		else {
+			model.put("error", "You have already subscribed to this plan !");
+		}
 		List<Subscription> list = personDAO.list(Integer.parseInt(session.getAttribute("customerid").toString()));
 		ArrayList<Integer> listOfPlanIds = new ArrayList<Integer>();
 		for(Subscription s : list) {
 			listOfPlanIds.add(s.getSub_planid());
 		}
-		
 		PlanDAO planDAO = context.getBean(PlanDAO.class);
 		List<Plan> planList = planDAO.listOfSubscriptions(listOfPlanIds);
+		List<Plan> availablePlansToChange = planDAO.listOfRemainingPlans(listOfPlanIds);
 		List<SubscribedPlans> finalList = new ArrayList<SubscribedPlans>();
 		for(int i=0;i<planList.size();i++) {
 			finalList.add(new SubscribedPlans(planList.get(i).getPlanid(), planList.get(i).getPlanname(), planList.get(i).getPlantype(), planList.get(i).getPlantariff(), planList.get(i).getPlanvalidity(), planList.get(i).getPlanrental(), list.get(i).getSub_startdate()));
@@ -165,7 +181,10 @@ public class TCSWirelessDispur {
 		//close resources
 		context.close();
 		session.setAttribute("subscriptionlist", finalList);
-		return new ModelAndView("customer_subscriptions", "list", finalList);
+		model.put("list", finalList);
+		model.put("availablePlansToChange", availablePlansToChange);
+		model.put("customerid", session.getAttribute("customerid").toString());
+		return new ModelAndView("customer_subscriptions", "model", model);
 		}
 		catch (Exception e) {
 			return new ModelAndView("index","message","something went wrong ! Please try again");
@@ -198,16 +217,17 @@ public class TCSWirelessDispur {
 			personDAO.delete(newPlan);	
 		}
 	    else {
-	    	model.put("error", "Plan must be 3 months old !");
+	    	model.put("error", "Plan must be 3 months old to cancel !");
 	    }
+	    
 		List<Subscription> list = personDAO.list(Integer.parseInt(session.getAttribute("customerid").toString()));
 		ArrayList<Integer> listOfPlanIds = new ArrayList<Integer>();
 		for(Subscription s : list) {
 			listOfPlanIds.add(s.getSub_planid());
 		}
-		
 		PlanDAO planDAO = context.getBean(PlanDAO.class);
 		List<Plan> planList = planDAO.listOfSubscriptions(listOfPlanIds);
+		List<Plan> availablePlansToChange = planDAO.listOfRemainingPlans(listOfPlanIds);
 		List<SubscribedPlans> finalList = new ArrayList<SubscribedPlans>();
 		for(int i=0;i<planList.size();i++) {
 			finalList.add(new SubscribedPlans(planList.get(i).getPlanid(), planList.get(i).getPlanname(), planList.get(i).getPlantype(), planList.get(i).getPlantariff(), planList.get(i).getPlanvalidity(), planList.get(i).getPlanrental(), list.get(i).getSub_startdate()));
@@ -216,6 +236,8 @@ public class TCSWirelessDispur {
 		context.close();
 		session.setAttribute("subscriptionlist", finalList);
 		model.put("list", finalList);
+		model.put("availablePlansToChange", availablePlansToChange);
+		model.put("customerid", session.getAttribute("customerid").toString());
 		return new ModelAndView("customer_subscriptions", "model", model);
 		}
 		catch (Exception e) {
@@ -223,6 +245,50 @@ public class TCSWirelessDispur {
 			return new ModelAndView("index","message","something went wrong ! Please try again");
 		}
 	}
+	
+	
+	
+	@RequestMapping(value="/changeplan",method = RequestMethod.GET)
+	public ModelAndView changePlan(@RequestParam("newplanid") String newplanid,
+			@RequestParam("oldplanid") String oldplanid,
+			@RequestParam("customerid") String customerid,
+			HttpSession session
+			) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");	
+		try {
+		SubscriptionDAO personDAO = context.getBean(SubscriptionDAO.class);
+		Subscription oldPlan = new Subscription();
+		oldPlan.setSub_planid(Integer.parseInt(oldplanid));
+		oldPlan.setSub_customerid(Integer.parseInt(customerid));
+		personDAO.change(oldPlan, Integer.parseInt(newplanid));
+		
+		List<Subscription> list = personDAO.list(Integer.parseInt(session.getAttribute("customerid").toString()));
+		ArrayList<Integer> listOfPlanIds = new ArrayList<Integer>();
+		for(Subscription s : list) {
+			listOfPlanIds.add(s.getSub_planid());
+		}
+		PlanDAO planDAO = context.getBean(PlanDAO.class);
+		List<Plan> planList = planDAO.listOfSubscriptions(listOfPlanIds);
+		List<Plan> availablePlansToChange = planDAO.listOfRemainingPlans(listOfPlanIds);
+		List<SubscribedPlans> finalList = new ArrayList<SubscribedPlans>();
+		for(int i=0;i<planList.size();i++) {
+			finalList.add(new SubscribedPlans(planList.get(i).getPlanid(), planList.get(i).getPlanname(), planList.get(i).getPlantype(), planList.get(i).getPlantariff(), planList.get(i).getPlanvalidity(), planList.get(i).getPlanrental(), list.get(i).getSub_startdate()));
+		}
+		//close resources
+		context.close();
+		session.setAttribute("subscriptionlist", finalList);
+		model.put("list", finalList);
+		model.put("availablePlansToChange", availablePlansToChange);
+		model.put("customerid", session.getAttribute("customerid").toString());
+		return new ModelAndView("customer_subscriptions", "model", model);
+		}
+		catch (Exception e) {
+			System.out.println(e);
+			return new ModelAndView("index","message","something went wrong ! Please try again");
+		}
+	}
+	
 	
 	
 	@RequestMapping(value="**",method = RequestMethod.GET)

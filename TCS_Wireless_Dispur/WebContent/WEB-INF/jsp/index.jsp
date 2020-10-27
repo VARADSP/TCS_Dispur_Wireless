@@ -216,7 +216,13 @@ textarea {
 
 <!-- partial:index.partial.html -->
 <div class="form">
-      <p style="color:red">${message} </p>
+<c:if test="${not empty message}">
+   <script>
+   M.toast({html: '<p style="color:red;">${message} :(</p>',classes: 'white rounded'})
+   instance.open();
+   </script>
+</c:if>
+      
       <ul class="tab-group">
         <li class="tab active"><a href="#customerLogin">Customer</a></li>
         <li class="tab"><a href="#managerLogin">Relationship Manager</a></li>

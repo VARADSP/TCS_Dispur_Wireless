@@ -50,4 +50,19 @@ public class PlanDAOImpl implements PlanDAO {
 			return new ArrayList<Plan>();
 		}
 	}
+
+	@Override
+	public List<Plan> listOfRemainingPlans(List<Integer> list) {
+		try {
+		Session session = this.sessionFactory.openSession();		
+		@SuppressWarnings("unchecked")
+		Query query = session.createQuery("from Plan where planid not in (:listofplans)").setParameterList("listofplans", list);
+		List<Plan> personList = query.list();
+		session.close();
+		return personList;
+		}
+		catch(Exception e) {
+			return new ArrayList<Plan>();
+		}
+	}
 }

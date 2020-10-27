@@ -13,4 +13,8 @@ public interface SubscriptionDAO {
 	
 	public List<Subscription> list(int customerid);
 	
+	public Boolean exists (Subscription old);
+
+	public void change(Subscription p, int newPlanId);
+	
 }
